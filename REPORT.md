@@ -31,6 +31,8 @@ The implementation follows the Multi-Agent Actor Critic approach presented in th
 
 ![Multi-agent decentralized actor, centralized critic][image4]
 
+Following the Multi-Agent Actor Critic approach, each racket is represented by an individual actor network only sampling from experiences observable by the individual agent, while the critic samples from the experiences of both agents.
+
 ### Actor Layout
 
 | Layer | Size | Description |
@@ -63,12 +65,17 @@ The implementation follows the Multi-Agent Actor Critic approach presented in th
 | LR_CRITIC  | 1e-4  |
 | WEIGHT_DECAY  | 0  |
 
-## Results and Future Improvements
+## Results 
 
 Finally, the environment was solved in x episodes with an verage score of y over the last 100 episodes.
 
 ![Trained Agent][image2]
 
 ![Score][image3]
+
+## Future Work
+By manually tweaking hyperparameters such as LR_ACTOR and LR_CRITIC finding an optimal value may be very time-consuming. Instead of manually manipulating these parameters, we could create a pipeline that automatically optimizes hyperparameters. Additionally, different model layouts including batch normalization or wider networks can be tried in order to speed up the learning process. 
+
+
 
 
