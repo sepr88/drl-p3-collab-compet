@@ -3,6 +3,7 @@
 [image1]: img/untrained-gif.gif "Untrained Agent"
 [image2]: img/trained-gif.gif "Trained Agent"
 [image3]: img/score.JPG "Trained Agent"
+[image4]: img/maddpg.JPG "Multi-agent decentralized actor, centralized critic"
 
 
 # Project 3: Collaboration and Competition
@@ -26,6 +27,41 @@ The environment is considered solved, when the average (over 100 episodes) of th
 
 ## Solution - Multi-Agent DDPG
 
+The implementation follows the Multi-Agent Actor Critic approach presented in this [paper](https://proceedings.neurips.cc/paper/2017/file/68a9750337a418a86fe06c1991a1d64c-Paper.pdf).
+
+![Multi-agent decentralized actor, centralized critic][image4]
+
+### Actor Layout
+
+| Layer | Size | Description |
+| ------------- | ------------- | ------------- |
+| Input  | 24  | State size of a single agent |
+| 1st Hidden Layer  | 24x400  | |
+| 2nd Hidden Layer  |400x300  | |
+| 3rd Hidden Layer  | 300x2 | |
+| Output  | 2  | Action size |
+
+#### Critic Layout
+
+| Layer | Size | Description |
+| ------------- | ------------- | ------------- |
+| Input  | 48 | State size of both agents |
+| 1st Hidden Layer  | 48x400  | |
+| 2nd Hidden Layer  |404x300  | |
+| 3rd Hidden Layer  | 300x1 | |
+| Output  | 1  |  |
+
+### Hyperparameters
+
+| Parameter | Value |
+| ------------- | ------------- |
+| BUFFER_SIZE  | 1e6  |
+| BATCH_SIZE  | 256  |
+| GAMMA  | 0.99  |
+| TAU  | 1e-3  |
+| LR_ACTOR  | 1e-4  |
+| LR_CRITIC  | 1e-4  |
+| WEIGHT_DECAY  | 0  |
 
 ## Results and Future Improvements
 
