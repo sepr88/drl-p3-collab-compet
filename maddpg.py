@@ -1,14 +1,9 @@
-# main code that contains the neural network setup
-# policy + critic updates
-# see ddpg.py for other details in the network
-
 from ddpg_agent import Agent
 import numpy as np
 import torch
 import random
 from collections import namedtuple, deque
-from utilities import soft_update, transpose_to_tensor, transpose_list
-#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 device = 'cpu'
 
 class MADDPG:
