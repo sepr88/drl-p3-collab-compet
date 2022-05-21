@@ -1,0 +1,30 @@
+
+SEED = 7
+N_EPISODES = 5000
+TRAIN_EVERY = 4
+REPEAT_TRAINING = 3
+
+# Experience Replay
+BUFFER_SIZE = int(1e6)
+BATCH_SIZE = 128
+
+GAMMA = 0.99
+TAU = 1e-3
+
+
+WEIGHT_DECAY = 0
+
+# Actor
+FC1_UNITS = 400
+FC2_UNITS = 300
+LR_ACTOR = 1e-4
+
+# Critic
+FCS1_UNITS = 400
+FCS2_UNITS = 300
+LR_CRITIC = 1e-3
+
+# Ornstein-Uhlenbeck Noise
+MU = 0.
+THETA = 0.15
+SIGMA = 0.2

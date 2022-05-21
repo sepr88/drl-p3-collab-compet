@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from params import *
+
 def hidden_init(layer):
     fan_in = layer.weight.data.size()[0]
     lim = 1. / np.sqrt(fan_in)
@@ -11,7 +13,7 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_size, action_size, seed, fc1_units=400, fc2_units=300):
+    def __init__(self, state_size, action_size, seed, fc1_units, fc2_units):
         """Initialize parameters and build model.
         Params
         ======
@@ -36,7 +38,6 @@ class Actor(nn.Module):
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
-
         x = F.relu(self.fc1(state))
         x = F.relu(self.fc2(x))
         return torch.tanh(self.fc3(x))
@@ -45,7 +46,7 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_size, action_size, seed, fcs1_units=400, fcs2_units=300):
+    def __init__(self, state_size, action_size, seed, fcs1_units, fcs2_units):
         """Initialize parameters and build model.
         Params
         ======

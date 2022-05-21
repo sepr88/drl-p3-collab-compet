@@ -4,39 +4,35 @@ import torch
 import random
 from collections import namedtuple, deque
 
+from params import *
+
 device = 'cpu'
 
 class MADDPG:
     """A wrapper object encapsulating mutliple agents interacting in a mixed cooperative competetive environment."""
     
-    def __init__(self, state_size, action_size, num_agents, random_seed, buffer_size=int(1e6), batch_size=128, discount_factor=0.95, tau=0.02, gamma=1e-3):
+    def __init__(self, state_size, action_size, num_agents):
         super(MADDPG, self).__init__()
-        """Initialize a Multi-Agent object.
+        """Initializes a Multi-Agent object.
         Params
         ======
             state_size (int):
             action_size (int):
             num_agents (int):
-            random_seed (int):
-            buffer_size (int): maximum size of shared replay buffer
-            batch_size (int): size of each training batch
         """
         # Initialize agents
-        self.random_seed = random_seed
+        self.random_seed = SEED
         self.num_agents = num_agents
         self.state_size = state_size
         self.action_size = action_size
-        self.agents = [Agent(self.state_size, self.action_size, self.random_seed) for _ in range(num_agents)]
+        self.agents = [Agent(self.state_size, self.action_size, self.random_seed,\
+                            fc1_units=FC1_UNITS, fc2_units=FC2_UNITS, fcs1_units=FCS1_UNITS, fcs2_units=FCS2_UNITS, \
+                            num_agents=num_agents) for _ in range(num_agents)]
         
         # Initialize a shared replay buffer
-        self.buffer_size = buffer_size
-        self.batch_size = batch_size
-        self.buffer = ReplayBuffer(self.buffer_size, self.batch_size, random_seed)
-
-        #self.discount_factor = discount_factor
-        #self.tau = tau
-        #self.gamma = gamma
-        #self.iter = 0
+        self.buffer_size = BUFFER_SIZE
+        self.batch_size = BATCH_SIZE
+        self.buffer = ReplayBuffer(self.buffer_size, self.batch_size, self.random_seed)
 
     def reset(self):
         """Resets each agent's noise."""

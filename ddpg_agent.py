@@ -2,25 +2,20 @@ import numpy as np
 import random
 import copy
 from collections import namedtuple, deque
-
+from params import *
 from model import Actor, Critic
 
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-GAMMA=0.99
-TAU=1e-3
-LR_ACTOR=1e-4
-LR_CRITIC=1e-4
-WEIGHT_DECAY=0
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent():
     """Interacts with and learns from the environment."""
     
-    def __init__(self, state_size, action_size, random_seed):
+    def __init__(self, state_size, action_size, random_seed, fc1_units, fc2_units, fcs1_units, fcs2_units, num_agents=1):
         """Initialize an Agent object.
         
         Params
@@ -31,20 +26,21 @@ class Agent():
         """
         self.state_size = state_size
         self.action_size = action_size
+        self.num_agents = num_agents
         self.seed = random.seed(random_seed)
         
         # Actor Network (w/ Target Network)
-        self.actor_local = Actor(state_size, action_size, random_seed).to(device)
-        self.actor_target = Actor(state_size, action_size, random_seed).to(device)
+        self.actor_local = Actor(state_size, action_size, random_seed, fc1_units=fc1_units, fc2_units=fc2_units).to(device)
+        self.actor_target = Actor(state_size, action_size, random_seed, fc1_units=fc1_units, fc2_units=fc2_units).to(device)
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=LR_ACTOR)
 
         # Critic Network (w/ Target Network)
-        self.critic_local = Critic(state_size*2, action_size*2, random_seed).to(device)
-        self.critic_target = Critic(state_size*2, action_size*2, random_seed).to(device)
+        self.critic_local = Critic(state_size*num_agents, action_size*num_agents, random_seed, fcs1_units=fcs1_units, fcs2_units=fcs2_units).to(device)
+        self.critic_target = Critic(state_size*num_agents, action_size*num_agents, random_seed, fcs1_units=fcs1_units, fcs2_units=fcs2_units).to(device)
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=LR_CRITIC, weight_decay=WEIGHT_DECAY)
 
         # Noise process
-        self.noise = OUNoise(action_size, random_seed)
+        self.noise = OUNoise(action_size, random_seed, mu=MU, theta=THETA, sigma=SIGMA)
 
             
     def act(self, state, add_noise=True):
@@ -83,6 +79,7 @@ class Agent():
         # extract only states and actions of the current agent
         agent_states = states[agent_id::2, :]
         agent_actions = actions[agent_id::2, :]
+        agent_rewards = rewards[agent_id::2, :]
         
         # extract only states and actions of the other agent
         other_agent_states = states[other_agent_id::2,:]
