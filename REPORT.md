@@ -2,9 +2,10 @@
 
 [image1]: img/untrained-gif.gif "Untrained Agent"
 [image2]: img/trained-gif.gif "Trained Agent"
-[image3]: img/score.png "Trained Agent"
+[image3]: img/first-score.png "First Score"
 [image4]: img/maddpg.JPG "Multi-agent decentralized actor, centralized critic"
 [image5]: img/maddpg-algo.png "MADDPG Pseudo-Code"
+[image6]: img/final-score.png "Final Score"
 
 
 # Project 3: Collaboration and Competition
@@ -38,6 +39,17 @@ Following the Multi-Agent Actor Critic approach, each racket is represented by a
 [Image Source](https://arxiv.org/pdf/1706.02275.pdf)
 
 
+### Results 
+At first, training turned out to be very slow. Only after ~2000 episodes the average score began to increase until it eventually started alternating around 0.35.
+
+![First Score][image3]
+
+Finally, the environment was solved in x episodes with an verage score of y over the last 100 episodes.
+
+![Trained Agent][image2]
+
+![Final Score][image6]
+
 ### Actor Layout
 
 | Layer | Size | Description |
@@ -48,7 +60,7 @@ Following the Multi-Agent Actor Critic approach, each racket is represented by a
 | 3rd Hidden Layer  | 300x2 | |
 | Output  | 2  | Action size |
 
-#### Critic Layout
+### Critic Layout
 
 | Layer | Size | Description |
 | ------------- | ------------- | ------------- |
@@ -70,16 +82,10 @@ Following the Multi-Agent Actor Critic approach, each racket is represented by a
 | LR_CRITIC  | 1e-4  |
 | WEIGHT_DECAY  | 0  |
 
-## Results 
 
-Finally, the environment was solved in x episodes with an verage score of y over the last 100 episodes.
-
-![Trained Agent][image2]
-
-![Score][image3]
 
 ## Future Work
-By manually tweaking hyperparameters such as LR_ACTOR and LR_CRITIC finding an optimal value may be very time-consuming. Instead of manually manipulating these parameters, we could create a pipeline that automatically optimizes hyperparameters. Additionally, different model layouts including batch normalization or wider networks can be tried in order to speed up the learning process. 
+In order to further speed up the learning rate we could use priority experience replay. A priority buffer, in addition to the agents' experiences, maintains a sampling probability for ech experience in the buffer which is proportional to its respective training loss (expected result vs actual result). The higher the sampling probability, the greater the chance that an experience is sampled which makes the network learn a lot. 
 
 
 
