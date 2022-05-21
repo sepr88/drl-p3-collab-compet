@@ -29,46 +29,55 @@ The environment is considered solved, when the average (over 100 episodes) of th
 
 ## Solution - Multi-Agent DDPG
 
-The implementation follows the Multi-Agent Actor Critic approach presented in this [paper](https://proceedings.neurips.cc/paper/2017/file/68a9750337a418a86fe06c1991a1d64c-Paper.pdf).
+Following the Multi-Agent Actor Critic approach presented [here](https://proceedings.neurips.cc/paper/2017/file/68a9750337a418a86fe06c1991a1d64c-Paper.pdf), each racket is represented by an individual actor network. While each actor only samples from own experiences, the central critic samples from the shared experiences of both agents.
 
-![Multi-agent decentralized actor, centralized critic][image4]
+<img src="img/maddpg.JPG" width="50%" height="50%" alt="Multi-agent decentralized actor, centralized critic" align="center">
 
-Following the Multi-Agent Actor Critic approach, each racket is represented by an individual actor network only sampling from experiences observable by the individual agent, while the critic samples from the experiences of both agents.
+The actor and critic networks consist of a fully-connected hidden layer followed by a batch normilization and two fully-connected hidden layers with relu activation:  
 
-![MADDPG Pseudo-Code][image5]
-[Image Source](https://arxiv.org/pdf/1706.02275.pdf)
+<table>
+<tr><th>Actor Layout </th><th>Critic Layout</th></tr>
+<tr><td>
 
+| Layer | Size | 
+| ------------- | ------------- | 
+| Input  | 24  | 
+| 1st Hidden Layer  | 24x400  | 
+| 2nd Hidden Layer  |400x300  | 
+| 3rd Hidden Layer  | 300x2 | 
+| Output  | 2  |
+
+</td><td>
+
+| Layer | Size |
+| ------------- | ------------- | 
+| Input  | 48 | 
+| 1st Hidden Layer  | 48x400  | 
+| 2nd Hidden Layer  | 404x300  | 
+| 3rd Hidden Layer  | 300x1 | 
+| Output  | 1  |  
+
+</td></tr> </table>
 
 ### Results 
 At first, training turned out to be very slow. Only after ~2000 episodes the average score began to increase until it eventually started alternating around 0.35.
-
-![First Score][image3]
-
 Finally, the environment was solved in x episodes with an verage score of y over the last 100 episodes.
 
-![Trained Agent][image2]
+<table>
+<tr><th>First Attempt</th><th>Final Result</th></tr>
+<tr><td>
+  
+![First Score][image3]
 
+</td><td>
+  
 ![Final Score][image6]
+  
+</td></tr> </table>
 
-### Actor Layout
+Finally, using the trained networks, the agents were able to cooperate and reliably kept the ball above the ground.   
 
-| Layer | Size | Description |
-| ------------- | ------------- | ------------- |
-| Input  | 24  | State size of a single agent |
-| 1st Hidden Layer  | 24x400  | |
-| 2nd Hidden Layer  |400x300  | |
-| 3rd Hidden Layer  | 300x2 | |
-| Output  | 2  | Action size |
-
-### Critic Layout
-
-| Layer | Size | Description |
-| ------------- | ------------- | ------------- |
-| Input  | 48 | State size of both agents |
-| 1st Hidden Layer  | 48x400  | |
-| 2nd Hidden Layer  |404x300  | |
-| 3rd Hidden Layer  | 300x1 | |
-| Output  | 1  |  |
+![Trained Agent][image2]
 
 ### Hyperparameters
 
@@ -79,10 +88,11 @@ Finally, the environment was solved in x episodes with an verage score of y over
 | GAMMA  | 0.99  |
 | TAU  | 1e-3  |
 | LR_ACTOR  | 1e-4  |
-| LR_CRITIC  | 1e-4  |
+| LR_CRITIC  | 1e-3  |
 | WEIGHT_DECAY  | 0  |
-
-
+| MU  | 0  |
+| THETA  | 0.15  |
+| SIGMA  | 0.2  |
 
 ## Future Work
 In order to further speed up the learning rate we could use priority experience replay. A priority buffer, in addition to the agents' experiences, maintains a sampling probability for ech experience in the buffer which is proportional to its respective training loss (expected result vs actual result). The higher the sampling probability, the greater the chance that an experience is sampled which makes the network learn a lot. 
