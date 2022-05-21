@@ -4,6 +4,7 @@
 [image2]: img/trained-gif.gif "Trained Agent"
 [image3]: img/score.png "Trained Agent"
 [image4]: img/maddpg.JPG "Multi-agent decentralized actor, centralized critic"
+[image5]: img/maddpg-algo.png "MADDPG Pseudo-Code"
 
 
 # Project 3: Collaboration and Competition
@@ -32,6 +33,10 @@ The implementation follows the Multi-Agent Actor Critic approach presented in th
 ![Multi-agent decentralized actor, centralized critic][image4]
 
 Following the Multi-Agent Actor Critic approach, each racket is represented by an individual actor network only sampling from experiences observable by the individual agent, while the critic samples from the experiences of both agents.
+
+![MADDPG Pseudo-Code][image5]
+[Image Source](https://arxiv.org/pdf/1706.02275.pdf)
+
 
 ### Actor Layout
 
