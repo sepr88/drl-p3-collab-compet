@@ -1,0 +1,10 @@
+# ignore local checkpoints
+.ipynb_checkpoints
+.vscode
+__pycache__
+
+# ignore training checkpoints
+ckpts/
+
+# ignore log files
+*.log
