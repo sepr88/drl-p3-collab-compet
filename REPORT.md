@@ -2,7 +2,7 @@
 
 [image1]: img/untrained-gif.gif "Untrained Agent"
 [image2]: img/trained-gif.gif "Trained Agent"
-[image3]: img/score.PNG "Trained Agent"
+[image3]: img/score.png "Trained Agent"
 [image4]: img/maddpg.JPG "Multi-agent decentralized actor, centralized critic"
 
 
