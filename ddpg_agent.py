@@ -41,9 +41,10 @@ class Agent():
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed, mu=MU, theta=THETA, sigma=SIGMA)
+        self.noise_factor = 1.
 
             
-    def act(self, state, add_noise=True):
+    def act(self, state, add_noise=True, noise_decay=1.0):
         """Returns actions for given state as per current policy."""
         state = torch.from_numpy(state).float().to(device)
         self.actor_local.eval()
@@ -51,7 +52,8 @@ class Agent():
             action = self.actor_local(state).cpu().data.numpy()
         self.actor_local.train()
         if add_noise:
-            action += self.noise.sample()
+            action += self.noise.sample() * self.noise_factor
+            self.noise_factor *= noise_decay
         return np.clip(action, -1, 1)
 
     def reset(self):
@@ -74,28 +76,37 @@ class Agent():
         if agent_id==0:
             other_agent_id = 1
         else:
-            other_agent_id = 0 
+            other_agent_id = 0
+
 
         # extract only states and actions of the current agent
-        agent_states = states[agent_id::2, :]
-        agent_actions = actions[agent_id::2, :]
-        agent_rewards = rewards[agent_id::2, :]
+        agent_states = states[agent_id::self.num_agents, :]
+        agent_actions = actions[agent_id::self.num_agents, :]
+        agent_next_states = next_states[agent_id::self.num_agents, :]
         
         # extract only states and actions of the other agent
-        other_agent_states = states[other_agent_id::2,:]
-        other_agent_id = actions[other_agent_id::2, :]
+        other_agent_states = states[other_agent_id::self.num_agents,:]
+        other_agent_actions = actions[other_agent_id::self.num_agents, :]
+        other_agent_next_states = next_states[other_agent_id::self.num_agents, :]
 
-      
+        full_states = torch.cat((agent_states, other_agent_states), dim=1).to(device)
+        full_actions = torch.cat((agent_actions, other_agent_actions), dim=1).to(device)
+        next_full_states = torch.cat((agent_next_states, other_agent_next_states), dim=1).to(device)
+        
+        
+
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
         # concatenate actions of both agents
-        actions_next = torch.cat((self.actor_target(agent_states), (self.actor_target(other_agent_states))), dim=1).to(device)
-        Q_targets_next = self.critic_target(next_full_states, actions_next)
+        full_actions_next = torch.cat((self.actor_target(agent_states), (self.actor_target(other_agent_states))), dim=1).to(device)
+        Q_targets_next = self.critic_target(next_full_states, full_actions_next)
         # Compute Q targets for current states (y_i)
         Q_targets = rewards + (GAMMA * Q_targets_next * (1 - dones))
+        
         # Compute critic loss
-        Q_expected = self.critic_local(full_states, torch.cat((agent_actions, other_agent_id), dim=1).to(device))
+        Q_expected = self.critic_local(full_states, full_actions)
         critic_loss = F.mse_loss(Q_expected, Q_targets)
+
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
@@ -104,9 +115,8 @@ class Agent():
 
         # ---------------------------- update actor ---------------------------- #
         # Compute actor loss
-        actions_pred = torch.cat((self.actor_local(agent_states), (self.actor_local(other_agent_states))), dim=1).to(device)
-        #actions_pred = self.actor_local(agent_states)
-        actor_loss = -self.critic_local(full_states, actions_pred).mean()
+        full_actions_pred = torch.cat((self.actor_local(agent_states), (self.actor_local(other_agent_states).detach())), dim=1).to(device)
+        actor_loss = -self.critic_local(full_states, full_actions_pred).mean()
         # Minimize the loss
         self.actor_optimizer.zero_grad()
         actor_loss.backward()

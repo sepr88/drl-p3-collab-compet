@@ -39,9 +39,9 @@ class MADDPG:
         for agent in self.agents:
             agent.reset()
 
-    def act(self, states, add_noise=True):
+    def act(self, states, add_noise=True, noise_decay=1.0):
         """Returns actions for given state as per current policy."""
-        return [agent.act(state, add_noise) for agent, state in zip(self.agents, states)]
+        return [np.reshape(agent.act(state, add_noise, noise_decay), -1) for agent, state in zip(self.agents, states)]
         
     def add_to_buffer(self, states, actions, rewards, next_states, dones):
         """Save experiences of multiple agents in a shared replay buffer"""
@@ -59,16 +59,15 @@ class MADDPG:
                 experiences = self.buffer.sample()
                 agent.learn(experiences, agent_id)
 
-    def save(self, prefix=''):
+    def save(self, dir='ckpts/', identifier=''):
         """Saves all networks."""
-        torch.save(self.agents[0].actor_local.state_dict(), 'checkpoint_agent_0_actor'+ prefix +'.pth')
-        torch.save(self.agents[0].critic_local.state_dict(), 'checkpoint_agent_0_critic'+ prefix +'.pth')
+        torch.save(self.agents[0].actor_local.state_dict(), dir + 'checkpoint_agent_0_actor'+ identifier +'.pth')
+        torch.save(self.agents[0].critic_local.state_dict(), dir + 'checkpoint_agent_0_critic'+ identifier +'.pth')
 
-        torch.save(self.agents[1].actor_local.state_dict(), 'checkpoint_agent_1_actor'+ prefix +'.pth')
-        torch.save(self.agents[1].critic_local.state_dict(), 'checkpoint_agent_1_critic'+ prefix +'.pth')
+        torch.save(self.agents[1].actor_local.state_dict(), dir + 'checkpoint_agent_1_actor'+ identifier +'.pth')
+        torch.save(self.agents[1].critic_local.state_dict(), dir + 'checkpoint_agent_1_critic'+ identifier +'.pth')
 
-    def load(self, agent_0_actor='checkpoint_agent_0_actor.pth', agent_0_critic='checkpoint_critic_0_critic.pth', \
-        agent_1_actor='checkpoint_agent_1_actor.pth', agent_1_critic='checkpoint_critic_1_critic.pth'):
+    def load(self, agent_0_actor, agent_0_critic, agent_1_actor, agent_1_critic):
         """Restores all agents."""
         self.agents[0].actor_local.load_state_dict(torch.load(agent_0_actor, map_location='cpu'))
         self.agents[0].critic_local.load_state_dict(torch.load(agent_0_critic, map_location='cpu'))
