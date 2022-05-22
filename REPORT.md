@@ -7,8 +7,7 @@
 [image5]: img/maddpg-algo.png "MADDPG Pseudo-Code"
 [image6]: img/final-score.png "Final Score"
 
-
-# Project 3: Collaboration and Competition
+# Project Report: Collaboration and Competition
 
 ## The Environment
 
@@ -96,6 +95,10 @@ Finally, using the trained networks, the agents were able to cooperate and relia
 
 ## Future Work
 In order to further speed up the learning rate we could use priority experience replay. A priority buffer, in addition to the agents' experiences, maintains a sampling probability for ech experience in the buffer which is proportional to its respective training loss (expected result vs actual result). The higher the sampling probability, the greater the chance that an experience is sampled which makes the network learn a lot. 
+
+## Appendix
+### Class Diagram
+<img src="img/classdiagram.png" width="60%" height="60%" alt="classdiagram">
 
 
 
