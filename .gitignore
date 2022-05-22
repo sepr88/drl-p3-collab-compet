@@ -8,3 +8,6 @@ ckpts/
 
 # ignore log files
 *.log
+
+# ignore drawings
+*.drawio
