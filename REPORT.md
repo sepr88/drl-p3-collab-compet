@@ -50,23 +50,29 @@ The actor and critic networks consist of a fully-connected hidden layer followed
 
 | Layer | Size |
 | ------------- | ------------- | 
-| Input  | 48 | 
-| 1st Hidden Layer  | 48x400  | 
-| 2nd Hidden Layer  | 404x300  | 
+| Input  | 52 | 
+| 1st Hidden Layer  | 52x400  | 
+| 2nd Hidden Layer  | 400x300  | 
 | 3rd Hidden Layer  | 300x1 | 
 | Output  | 1  |  
 
 </td></tr> </table>
 
 ### Results 
-At first, training turned out to be very slow. Only after ~2000 episodes the average score began to increase until it eventually started alternating around 0.35.
-Finally, the environment was solved in x episodes with an verage score of y over the last 100 episodes.
+At first, training turned out to be very slow. Only after ~2000 episodes the average score began to increase until it eventually started alternating around an average reward of **`0.35`** (see figure below). The following modifications helped the agents to converge faster and achieve higher average scores:
+- decreasing the batch size from **`1024`** down to **`256`**
+- updating only every **`7`** episodes
+- updating multiple (**`5`**) times per episode
+- adding noise decay (**`0.995`**)
+- adding batch normalization to both the actor and critic network
+
+Finally (and after several attempts), the environment was solved after **`1424`** episodes with an average score of **`+0.50`** over the last 100 episodes. The best result was achieved after **`1875`** episodes with an average score of **`+1.92`**.
 
 <table>
 <tr><th>First Attempt</th><th>Final Result</th></tr>
 <tr><td>
   
-![First Score][image3]
+![First Attempt][image3]
 
 </td><td>
   
@@ -74,7 +80,7 @@ Finally, the environment was solved in x episodes with an verage score of y over
   
 </td></tr> </table>
 
-Finally, using the trained networks, the agents were able to cooperate and reliably kept the ball above the ground.   
+Using the trained networks, the agents were able to cooperate and reliably kept the ball above the ground.   
 
 ![Trained Agent][image2]
 
@@ -87,8 +93,9 @@ Finally, using the trained networks, the agents were able to cooperate and relia
 | GAMMA  | 0.99  |
 | TAU  | 1e-3  |
 | LR_ACTOR  | 1e-4  |
-| LR_CRITIC  | 1e-3  |
+| LR_CRITIC  | 3e-4  |
 | WEIGHT_DECAY  | 0  |
+| NOISE_DECAY  | 0.995  |
 | MU  | 0  |
 | THETA  | 0.15  |
 | SIGMA  | 0.2  |
