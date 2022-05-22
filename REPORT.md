@@ -65,6 +65,7 @@ At first, training turned out to be very slow. Only after ~2000 episodes the ave
 - updating multiple (**`5`**) times per episode
 - adding noise decay (**`0.995`**)
 - adding batch normalization to both the actor and critic network
+- using ReLU activation (instead of leaky ReLU)
 
 Finally (and after several attempts), the environment was solved after **`1424`** episodes with an average score of **`+0.50`** over the last 100 episodes. The best result was achieved after **`1875`** episodes with an average score of **`+1.92`**.
 
