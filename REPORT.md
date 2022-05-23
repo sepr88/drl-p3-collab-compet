@@ -1,7 +1,7 @@
 [//]: # (Image References)
 
-[image1]: img/untrained-gif.gif "Untrained Agent"
-[image2]: img/trained-gif.gif "Trained Agent"
+[image1]: img/untrained.gif "Untrained Agent"
+[image2]: img/trained.gif "Trained Agent"
 [image3]: img/first-score.png "First Score"
 [image4]: img/maddpg.JPG "Multi-agent decentralized actor, centralized critic"
 [image5]: img/maddpg-algo.png "MADDPG Pseudo-Code"
