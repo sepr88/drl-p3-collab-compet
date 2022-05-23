@@ -47,10 +47,10 @@ class MADDPG:
         """Save experiences of multiple agents in a shared replay buffer"""
         
         # concatenate the states of each agent to a shared state of all agents
-        full_states = np.reshape(states, newshape=(-1))
-        next_full_states = np.reshape(next_states, newshape=(-1))
+        #full_states = np.reshape(states, newshape=(-1))
+        #next_full_states = np.reshape(next_states, newshape=(-1))
                 
-        self.buffer.add(states, full_states, actions, rewards, next_states, next_full_states, dones)
+        self.buffer.add(states, actions, rewards, next_states, dones)
 
     def train(self):
         """Updates each actor and the shared critic."""
@@ -88,12 +88,12 @@ class ReplayBuffer:
         """
         self.memory = deque(maxlen=buffer_size)  # internal memory (deque)
         self.batch_size = batch_size
-        self.experience = namedtuple("Experience", field_names=["state", "full_state", "action", "reward", "next_state", "next_full_state", "done"])
+        self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
         self.seed = random.seed(seed)
     
-    def add(self, states, full_states, actions, rewards, next_states, next_full_states, dones):
+    def add(self, states, actions, rewards, next_states, dones):
         """Add a new experience to memory."""
-        e = self.experience(states, full_states, actions, rewards, next_states, next_full_states, dones)
+        e = self.experience(states, actions, rewards, next_states, dones)
         self.memory.append(e)
     
     def sample(self):
@@ -101,14 +101,12 @@ class ReplayBuffer:
         experiences = random.sample(self.memory, k=self.batch_size)
 
         states = torch.from_numpy(np.vstack([e.state for e in experiences if e is not None])).float().to(device)
-        full_states = torch.from_numpy(np.vstack([e.full_state for e in experiences if e is not None])).float().to(device)
         actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).float().to(device)
         rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
         next_states = torch.from_numpy(np.vstack([e.next_state for e in experiences if e is not None])).float().to(device)
-        next_full_states = torch.from_numpy(np.vstack([e.next_full_state for e in experiences if e is not None])).float().to(device)
         dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
 
-        return (states, full_states, actions, rewards, next_states, next_full_states, dones)
+        return (states, actions, rewards, next_states, dones)
 
     def __len__(self):
         """Return the current size of internal memory."""

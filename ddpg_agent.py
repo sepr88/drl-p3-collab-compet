@@ -71,13 +71,12 @@ class Agent():
             experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples 
             gamma (float): discount factor
         """
-        states, full_states, actions, rewards, next_states, next_full_states, dones = experiences
+        states, actions, rewards, next_states, dones = experiences
 
         if agent_id==0:
             other_agent_id = 1
         else:
             other_agent_id = 0
-
 
         # extract only states and actions of the current agent
         agent_states = states[agent_id::self.num_agents, :]
@@ -89,17 +88,18 @@ class Agent():
         other_agent_actions = actions[other_agent_id::self.num_agents, :]
         other_agent_next_states = next_states[other_agent_id::self.num_agents, :]
 
+        # concatenate states, actions, and next_states for critic update
         full_states = torch.cat((agent_states, other_agent_states), dim=1).to(device)
         full_actions = torch.cat((agent_actions, other_agent_actions), dim=1).to(device)
         next_full_states = torch.cat((agent_next_states, other_agent_next_states), dim=1).to(device)
         
         
-
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
         # concatenate actions of both agents
         full_actions_next = torch.cat((self.actor_target(agent_states), (self.actor_target(other_agent_states))), dim=1).to(device)
         Q_targets_next = self.critic_target(next_full_states, full_actions_next)
+        
         # Compute Q targets for current states (y_i)
         Q_targets = rewards + (GAMMA * Q_targets_next * (1 - dones))
         
@@ -110,13 +110,13 @@ class Agent():
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
-        #torch.nn.utils.clip_grad_norm(self.critic_local.parameters(), 1)
         self.critic_optimizer.step()
 
         # ---------------------------- update actor ---------------------------- #
         # Compute actor loss
         full_actions_pred = torch.cat((self.actor_local(agent_states), (self.actor_local(other_agent_states).detach())), dim=1).to(device)
         actor_loss = -self.critic_local(full_states, full_actions_pred).mean()
+        
         # Minimize the loss
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
